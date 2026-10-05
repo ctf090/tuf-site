@@ -39,13 +39,11 @@ Site de uma academia de artes marciais, feito por **[ctf090](https://github.com/
    | Endereço e horários | Seção `id="local"` e `id="horarios"` |
    | Planos e preços | Seção `id="planos"` |
    | Mapa | Atributo `src` do `<iframe>` na seção de localização |
-   | Fotos e logo | Tags `<img>` (veja a nota abaixo) |
+   | Fotos e logo | Pasta `img/` (troque os arquivos mantendo o nome, ou mude o `src` das tags `<img>`) |
 
 3. Troque as **cores** no topo do `style.css`, em `:root`. A cor principal é a variável `--laranja`.
 4. Gere um novo `favicon.ico` com a sua logo e substitua o arquivo.
 5. Publique: **Settings → Pages → Deploy from a branch → main → / (root)**.
-
-> **Fotos:** neste projeto as imagens estão embutidas no `index.html` (formato base64). Para usar arquivos normais, coloque a foto numa pasta `img/` e troque o `src` por `img/foto.jpg`.
 
 > **Mapa:** se trocar o link do mapa por outro domínio que não seja do Google, ajuste também `frame-src` na tag de CSP no começo do `index.html`.
 
@@ -56,7 +54,8 @@ Site de uma academia de artes marciais, feito por **[ctf090](https://github.com/
 ├── style.css
 ├── script.js
 ├── favicon.ico
-└── apple-touch-icon.png
+├── apple-touch-icon.png
+└── img/            (logo e fotos)
 ```
 
 ## Rodar localmente
