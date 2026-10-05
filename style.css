@@ -439,3 +439,6 @@ section[id]{scroll-margin-top:70px;}
 .link-laranja{color:var(--laranja);}
 .btn-rota{margin-top:28px;width:fit-content;}
 .cta-final h2{margin-top:14px;}
+
+/* saida suave da secao ao trocar de aba */
+.js .rv.sai>*{opacity:0;transform:translateY(-28px);transition:opacity .28s ease,transform .28s ease;transition-delay:0s;}

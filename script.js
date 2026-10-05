@@ -56,27 +56,37 @@
   };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(atualizaAtiva); } }, { passive: true });
 
-  /* ---- cortina: saída → troca → abertura ---- */
-  const cortina = document.getElementById('curtain');
-  const estado = c => { cortina.className = 'curtain' + (c ? ' ' + c : ''); };
+  /* ---- troca de aba: saída suave -> rolagem suave -> entrada ---- */
+  let indo = false;
+  const fimScroll = () => new Promise(res => {
+    let last = -1, n = 0;
+    const t = setInterval(() => {
+      if (scrollY === last) { if (++n >= 3) { clearInterval(t); res(); } }
+      else { n = 0; last = scrollY; }
+    }, 60);
+    setTimeout(() => { clearInterval(t); res(); }, 2500);
+  });
 
   async function irPara(alvo) {
-    if (busy) return;
-    busy = true;
-    estado('cover');                 // SAÍDA: cortina fecha
-    await wait(480);
-    if (alvo.id === 'topo') window.scrollTo({ top: 0, behavior: 'instant' });
-    else alvo.scrollIntoView({ behavior: 'instant', block: 'start' });
-    secoes.forEach(s => s.classList.remove('in'));
-    void document.body.offsetHeight;
-    await wait(80);
-    estado('leave');                 // ABERTURA: cortina abre
-    await wait(120);
-    revelaVisiveis();                // conteúdo sobe suave
+    if (indo) return;
+    indo = true;
+    // SAÍDA: o que está na tela some subindo
+    const saindo = secoes.filter(s => {
+      const r = s.getBoundingClientRect();
+      return s !== alvo && r.top < innerHeight && r.bottom > 0;
+    });
+    saindo.forEach(s => s.classList.add('sai'));
+    await wait(280);
+    alvo.classList.remove('in');
+    // rolagem suave até a seção
+    if (alvo.id === 'topo') window.scrollTo({ top: 0, behavior: 'smooth' });
+    else alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    await fimScroll();
+    // ENTRADA: conteúdo novo sobe suave
+    saindo.forEach(s => { s.classList.remove('sai'); s.classList.remove('in'); });
+    revelaVisiveis();
     atualizaAtiva();
-    await wait(480);
-    estado('');
-    busy = false;
+    indo = false;
   }
 
   document.addEventListener('click', e => {
@@ -91,20 +101,7 @@
     irPara(alvo);
   });
 
-  /* ---- abertura inicial ---- */
-  async function abertura() {
-    if (reduce) { busy = false; revelaVisiveis(); atualizaAtiva(); return; }
-    estado('cover');
-    cortina.style.transition = 'none';
-    void cortina.offsetWidth;
-    cortina.style.transition = '';
-    await wait(350);
-    estado('leave');
-    await wait(450);
-    estado('');
-    busy = false;
-    revelaVisiveis();
-    atualizaAtiva();
-  }
-  if (document.readyState === 'complete') abertura(); else addEventListener('load', abertura);
+  /* ---- carregamento inicial ---- */
+  const iniciar = () => { busy = false; revelaVisiveis(); atualizaAtiva(); };
+  if (document.readyState === 'complete') iniciar(); else addEventListener('load', iniciar);
 })();
